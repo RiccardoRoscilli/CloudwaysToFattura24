@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudwaysToFattura24</title>
-</head>
-<body>
+
     <h1>CloudwaysToFattura24</h1>
 
     <h2>Descrizione</h2>
@@ -51,5 +44,4 @@
 
     <h2>Licenza</h2>
     <p>Questo progetto è rilasciato sotto la licenza GNU GPL 2.0 Consulta il file <code>LICENSE</code> per maggiori dettagli.</p>
-</body>
-</html>
+ 
