@@ -1,66 +1,55 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudwaysToFattura24</title>
+</head>
+<body>
+    <h1>CloudwaysToFattura24</h1>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+    <h2>Descrizione</h2>
+    <p>CloudwaysToFattura24 è un'applicazione sviluppata in Laravel che permette di gestire e sincronizzare i servizi di hosting tra Cloudways e Fattura24, uno strumento di fatturazione italiano. L'app consente di importare dati sui server e le applicazioni direttamente da Cloudways tramite API e di generare automaticamente ordini di fatturazione su Fattura24 sempre tramite API, rendendo più efficiente la gestione delle fatture per i servizi rivenduti ai clienti.</p>
 
-## About Laravel
+    <h2>Funzionalità principali</h2>
+    <ul>
+        <li><strong>Sincronizzazione dati da Cloudways:</strong> Importa i dettagli dei server e delle applicazioni in modo automatico tramie API, visualizzando i dati in modo ordinato con DataTables.
+        Non è possibile importare le mailbox di Rackspace in quanto Cloudways è sprovvista di un API specifica.
+        E' necessario quindi procedere all'import tramite file csv.</li>
+                <li><strong>Sincronizzazione clienti da Fattura24:</strong> L'importazione dei clienti avviene tramite exporte del csv da Fattura24 ed import apposito form di upload sull'app. Purtroppo non 
+                è possibile importare la rubrica tramite API perchè Fattura24 è sprovvista di una API specifica.</li>
+        <li><strong>Associazione clienti:</strong> Associa ogni applicazione a un cliente specifico, in modo da avere sempre sotto controllo l'assegnazione dei servizi.</li>
+        <li><strong>Creazione automatica di ordini su Fattura24:</strong> Utilizzando le API di Fattura24, genera automaticamente ordini su Fattura24, risparmiando tempo e minimizzando errori manuali.</li>
+        <li><strong>Gestione dei pagamenti:</strong> Tiene traccia dello stato del pagamento per ogni ordine, inclusi dettagli come tipo di pagamento, data e ID. Aggiorna di conseguenza anche lo status dell'ordine.</li>
+    </ul>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+    <h2>Installazione</h2>
+    <ol>
+        <li>Clona il repository:
+            <pre><code>git clone https://github.com/RiccardoRoscilli/CloudwaysToFattura24.git</code></pre>
+        </li>
+        <li>Configura il file <code>.env</code> per connettere l'applicazione a Cloudways e Fattura24, specificando le rispettive chiavi API e altri dettagli necessari.</li>
+        <li>CLOUDWAYS_API_KEY, CLOUDWAYS_EMAIL, FATTURA24_API_KEY</li>
+        <li>Installa le dipendenze:
+            <pre><code>composer install</code></pre>
+            <pre><code>npm install && npm run dev</code></pre>
+        </li>
+        <li>Esegui le migrazioni per configurare il database:
+            <pre><code>php artisan migrate</code></pre>
+        </li>
+    </ol>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+    <h2>Utilizzo</h2>
+    <ul>
+        <li><strong>Importazione dei dati:</strong> Tramite il pannello amministrativo, è possibile importare i dati da Cloudways per sincronizzare i server e le applicazioni.</li>
+        <li><strong>Creazione di ordini:</strong> Gli ordini vengono creati automaticamente all'inizio di ogni trimestre e sono associati ai rispettivi clienti.</li>
+        <li><strong>Invio a Fattura24:</strong> Con un semplice clic, è possibile inviare l'ordine a Fattura24 e generare automaticamente il documento di fatturazione.</li>
+    </ul>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+    <h2>Contributi</h2>
+    <p>Se desideri contribuire al progetto, sentiti libero di creare pull request o di aprire nuove issue per segnalare bug o suggerire miglioramenti. Oppure scrivi a riccardo[punto]roscilli[at]gmail.com</p>
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    <h2>Licenza</h2>
+    <p>Questo progetto è rilasciato sotto la licenza GNU GPL 2.0 Consulta il file <code>LICENSE</code> per maggiori dettagli.</p>
+</body>
+</html>
