@@ -34,4 +34,8 @@ class Customer extends Model
     {
         return $this->hasMany(Application::class);
     }
+    public function mailBoxes()
+    {
+        return $this->hasMany(MailBox::class);
+    }
 }

@@ -14,9 +14,10 @@
         <table class="table table-bordered yajra-datatable" style="width: 100%;">
             <thead>
                 <tr>
-                    <th>Nome Applicazione</th>
-                    <th>Versione</th>
-                    <th>Server ID</th>
+                    <th>Email</th>
+                    <th>Server</th>
+                    <th>IMAP Port</th>
+                    <th>SMTP Port</th>
                     <th>Cliente Associato</th>
                     <th>Azioni</th>
                 </tr>
@@ -28,31 +29,43 @@
 
     <script type="text/javascript">
         $(function() {
-            var entity = 'application'; // Definisci il model dinamicamente
+            var entity = 'mailbox'; // Nome corretto del model
             var url = "/datatable/" + entity;
             var table = $('.yajra-datatable').DataTable({
                 processing: true,
                 stateSave: true,
                 serverSide: true,
-                ajax: url,
+                ajax: {
+                    url: url,
+                    error: function(xhr, status, error) {
+                        if (xhr.status === 401) {
+                            // Se l'errore è Unauthenticated (401), reindirizza alla pagina di login
+                            window.location.href = '/login';
+                        }
+                    }
+                },
                 columns: [{
-                        data: 'label',
-                        name: 'label'
+                        data: 'email',
+                        name: 'email'
                     },
                     {
-                        data: 'app_version',
-                        name: 'app_version'
+                        data: 'server',
+                        name: 'server'
                     },
                     {
-                        data: 'server_id',
-                        name: 'server_id'
+                        data: 'IMAPport',
+                        name: 'IMAPport'
                     },
                     {
-                        data: 'name',
+                        data: 'SMTPport',
+                        name: 'SMTPport'
+                    },
+                    {
+                        data: 'customer_name',
                         name: 'customers.name',
                         render: function(data, type, row) {
                             return data ? data :
-                                'Nessun cliente'; // Mostra 'Nessun cliente' se customer è null
+                            'Nessun cliente'; // Mostra 'Nessun cliente' se customer è null
                         }
                     },
                     {
@@ -61,10 +74,8 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            return `
-            <a href="/applications/${data}" class="btn btn-sm btn-primary">Associa Cliente</a>
-            <a href="/applications/${data}/edit" class="btn btn-sm btn-secondary">Visualizza Dettagli</a>
-        `;
+                            return '<a href="/mailboxes/' + data +
+                                '" class="btn btn-sm btn-primary">Associa Cliente</a>';
                         }
                     }
 

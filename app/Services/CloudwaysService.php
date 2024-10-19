@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 class CloudwaysService
 {
@@ -39,7 +40,6 @@ class CloudwaysService
                 // Stampa la risposta per comprendere eventuali problemi
                 return $body; // Potresti loggare il corpo per ulteriori debug
             }
-
         } catch (\Exception $e) {
             // Gestisci gli errori di eccezione
             return $e->getMessage(); // Logga o visualizza il messaggio di errore
@@ -56,7 +56,12 @@ class CloudwaysService
                 ]
             ]);
 
-            return json_decode($response->getBody(), true);
+            $responseBody = json_decode($response->getBody(), true);
+
+            // Logga la risposta dell'API
+            Log::info('Cloudways API Response:', ['response' => $responseBody]);
+
+            return $responseBody;
         } catch (\Exception $e) {
             return ['error' => $e->getMessage()];
         }

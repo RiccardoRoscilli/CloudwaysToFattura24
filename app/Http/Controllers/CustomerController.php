@@ -111,7 +111,7 @@ class CustomerController extends Controller
     // CRUD: Mostra il form per creare un nuovo cliente
     public function create()
     {
-        return view('customers.create');
+        return view('customers.edit');
     }
 
     // CRUD: Salva un nuovo cliente nel database

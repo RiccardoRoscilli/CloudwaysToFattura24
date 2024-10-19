@@ -79,6 +79,9 @@
                             <a class="nav-link" href="{{ route('applications.index') }}">Applications</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('mailboxes.index') }}">Mailboxes</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('orders.index') }}">Orders</a>
                         </li>
                     </ul>
@@ -132,4 +135,12 @@
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<!-- nasconde i messaggi dopo 2 secondi -->
+<script>
+    $(document).ready(function() {
+        setTimeout(function() {
+            $('.alert-success').fadeOut('slow');
+        }, 2000); // Nasconde dopo 2 secondi (2000 millisecondi)
+    });
+</script>
 </html>

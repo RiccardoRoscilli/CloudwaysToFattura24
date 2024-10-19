@@ -24,9 +24,17 @@ class ApplicationController extends Controller
             })
             ->make(true);
     }
-    public function edit(Application $application)
+    public function edit($id)
     {
-        return view('applications.edit', compact('application'));
+        $application = Application::find($id); // Trova l'applicazione per ID
+        $customers = Customer::all(); // Recupera tutti i clienti disponibili
+
+        // Controlla se l'applicazione esiste
+        if (!$application) {
+            return redirect()->back()->with('error', 'Applicazione non trovata');
+        }
+
+        return view('applications.edit', compact('application', 'customers'));
     }
 
     public function update(Request $request, Application $application)
@@ -46,8 +54,10 @@ class ApplicationController extends Controller
 
         return redirect()->route('applications.index')->with('success', 'Application aggiornata con successo');
     }
-    public function show($id)
+
+    public function associate($id)
     {
+
         $application = Application::find($id); // Trova l'applicazione per ID
         $customers = Customer::all(); // Recupera tutti i clienti disponibili
 

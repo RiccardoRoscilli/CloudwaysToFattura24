@@ -8,6 +8,7 @@ use App\Http\Controllers\CloudwaysController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\MailboxController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -39,7 +40,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+// rotte protette per l'admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
+
+    Route::resource('mailboxes', MailboxController::class);
+    Route::get('/datatable/mail-boxes', [MailboxController::class, 'getMailBoxesData']);
+
     // Rotta per l'importazione da Fattura24
     Route::post('/cloudways/import', [CloudwaysController::class, 'importServersAndApps'])->name('cloudways.import');
 
@@ -68,18 +76,26 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/datatable/{model}', function ($model) {
         $controllerClass = '\\App\\Http\\Controllers\\' . ucfirst($model) . 'Controller';
-        $method = 'get' . ucfirst($model) . 's';
 
+        if (substr($model, -1) === 'x') {
+            $method = 'get' . ucfirst($model) . 'es'; // getMailBoxesData
+        } else {
+            $method = 'get' . ucfirst($model) . 's'; // getCustomersData
+        }
         if (class_exists($controllerClass) && method_exists($controllerClass, $method)) {
             $controllerInstance = app($controllerClass); // Crea un'istanza del controller
             return app()->call([$controllerInstance, $method]); // Chiama il metodo sull'istanza
         }
 
-        abort(404, 'Controller o metodo non trovato');
+        abort(404, 'Controller '. $controllerClass . ' o metodo ' .  $method . ' non trovato' );
     })->name('datatable.generic');
 
-    Route::get('/applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
+    // associazioni servizi con clienti
+    Route::get('/applications/{application}', [ApplicationController::class, 'associate'])->name('applications.show');
     Route::post('/applications/{application}/associate-customer', [ApplicationController::class, 'associateCustomerToApplication'])->name('applications.associateCustomer');
+
+    Route::get('/mailboxes/{id}', [MailBoxController::class, 'show'])->name('mailboxes.show');
+    Route::post('/mailboxes/{id}/associate', [MailBoxController::class, 'associateCustomerToMailBox'])->name('mailboxes.associate');
 
 
     // api e import
