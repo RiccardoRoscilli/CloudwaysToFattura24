@@ -2,7 +2,15 @@
 
 @section('content')
     <div class="container">
-        <h1>Modifica Configurazione</h1>
+        <h1>Modifica Configurazione </h1>
+        <p>Ambiente corrente: {{ env('APP_ENV') }}</p>
+
+        @if (env('APP_ENV') === 'demo')
+        <p class="alert alert-warning">
+            Attenzione: questa è una versione demo. Per motivi di sicurezza, ricordati di modificare le API e le password una volta terminato l'utilizzo della demo.
+            <br>Inolre non lasciare i tuoi dati sulla configurazione, grazie.
+        </p>
+    @endif
 
         @if (session('success'))
             <div class="alert alert-success">
