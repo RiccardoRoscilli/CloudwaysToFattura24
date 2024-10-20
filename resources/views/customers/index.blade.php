@@ -13,6 +13,7 @@
     <div class="container mt-0">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <a href="{{ route('customers.create') }}" class="btn btn-primary">Nuovo Cliente</a>
+            <a href="{{ route('import.customers.form') }}" class="btn btn-info">Importa clienti da Fattura24</a>
         </div>
 
         <table class="table table-bordered yajra-datatable" style="width: 100%;">

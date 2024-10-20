@@ -9,6 +9,7 @@ use App\Http\Controllers\ServerController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\MailboxController;
+use App\Http\Controllers\ConfigurationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -45,6 +46,9 @@ Route::middleware('auth')->group(function () {
 // rotte protette per l'admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
+    Route::get('/configuration/edit', [ConfigurationController::class, 'edit'])->name('configuration.edit');
+    Route::post('/configuration/update', [ConfigurationController::class, 'update'])->name('configuration.update');
+
     Route::resource('mailboxes', MailboxController::class);
     Route::get('/datatable/mail-boxes', [MailboxController::class, 'getMailBoxesData']);
 
@@ -72,6 +76,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // pulsante invio a f24
     Route::post('/orders/{order}/sendToFattura24', [OrderController::class, 'sendToFattura24'])->name('orders.sendToFattura24');
 
+    // test configurazione api
+    Route::post('/test/cloudways-api', [ConfigurationController::class, 'testCloudwaysApi'])->name('test.cloudways.api');
+    Route::post('/test/fattura24-api', [ConfigurationController::class, 'testFattura24Api'])->name('test.fattura24.api');
 
 
     Route::get('/datatable/{model}', function ($model) {
@@ -87,7 +94,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             return app()->call([$controllerInstance, $method]); // Chiama il metodo sull'istanza
         }
 
-        abort(404, 'Controller '. $controllerClass . ' o metodo ' .  $method . ' non trovato' );
+        abort(404, 'Controller ' . $controllerClass . ' o metodo ' .  $method . ' non trovato');
     })->name('datatable.generic');
 
     // associazioni servizi con clienti

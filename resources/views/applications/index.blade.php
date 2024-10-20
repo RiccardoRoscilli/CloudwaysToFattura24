@@ -60,13 +60,15 @@
                         name: 'action',
                         orderable: false,
                         searchable: false,
+                        className: 'text-center', // Classe per centrare i pulsanti
                         render: function(data, type, row) {
                             return `
             <a href="/applications/${data}" class="btn btn-sm btn-primary">Associa Cliente</a>
-            <a href="/applications/${data}/edit" class="btn btn-sm btn-secondary">Visualizza Dettagli</a>
+            <a href="/applications/${data}/edit" class="btn btn-sm btn-info">Visualizza Dettagli</a>
         `;
                         }
                     }
+
 
                 ]
             });

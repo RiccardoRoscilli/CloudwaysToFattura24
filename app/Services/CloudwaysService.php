@@ -20,31 +20,45 @@ class CloudwaysService
     // Ottieni il token di autenticazione da Cloudways
     public function authenticate()
     {
-
         try {
-            // Effettua la richiesta POST per ottenere il token OAuth
+            // Ottieni l'utente autenticato
+            $userId = auth()->id();
+
+            // Recupera la configurazione dell'utente dal database
+            $configuration = \App\Models\Configuration::where('user_id', $userId)->first();
+
+             // Controlla se la configurazione esiste e se i campi email e API key non sono vuoti
+             if (!$configuration || empty($configuration->cloudways_email) || empty($configuration->cloudways_api_key)) {
+              //  Log::error('Errore: Configurazione mancante o incompleta per l\'utente con ID: ' . $userId);
+                return 'Errore: Configurazione non trovata o incompleta per l\'utente';
+            }
+
+            // Effettua la richiesta POST per ottenere il token OAuth usando i dati dal database
             $response = $this->client->post($this->apiUrl . '/oauth/access_token', [
                 'form_params' => [
-                    'email' => env('CLOUDWAYS_EMAIL'),
-                    'api_key' => env('CLOUDWAYS_API_KEY'),
+                    'email' => $configuration->cloudways_email, // Usa l'email salvata nel DB
+                    'api_key' => $configuration->cloudways_api_key, // Usa l'API key salvata nel DB
                 ]
             ]);
 
             // Decodifica il corpo della risposta
             $body = json_decode($response->getBody(), true);
 
+          //   Log::info('Risposta dall\'API Cloudways:', $body); // Questo loggherà la risposta come array
+
             // Verifica se il token è presente nella risposta
             if (isset($body['access_token'])) {
                 return $body['access_token'];
             } else {
-                // Stampa la risposta per comprendere eventuali problemi
-                return $body; // Potresti loggare il corpo per ulteriori debug
+                // Loggare il corpo per ulteriori debug in caso di errore
+                return $body;
             }
         } catch (\Exception $e) {
-            // Gestisci gli errori di eccezione
-            return $e->getMessage(); // Logga o visualizza il messaggio di errore
+            // Gestione degli errori
+            return $e->getMessage(); // Logga o mostra il messaggio di errore
         }
     }
+
 
     // Recupera i servizi dall'API Cloudways
     public function getServersWithApplications($accessToken)

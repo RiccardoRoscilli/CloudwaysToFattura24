@@ -1,9 +1,11 @@
 <?php
 
+
 namespace App\Services;
 
 use GuzzleHttp\Client;
-use App\Models\Customer;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Configuration; // Aggiungi questa linea
 
 class Fattura24Service
 {
@@ -17,13 +19,24 @@ class Fattura24Service
         ]);
     }
 
-    public function importCustomers()
+    public function testKey()
     {
         try {
-            // Esegui la richiesta all'API
+            // Recupera l'utente autenticato
+            $userId = auth()->id();  // Usa l'helper globale
+
+            // Recupera la configurazione dell'utente dal database
+            $configuration = Configuration::where('user_id', $userId)->first();
+
+            // Verifica se la configurazione è presente e se ha la chiave API
+            if (!$configuration || empty($configuration->fattura24_api_key)) {
+                return 'Errore: Chiave API Fattura24 non trovata.';
+            }
+
+            // Effettua la richiesta di test per verificare l'API key
             $response = $this->client->post('TestKey', [
                 'form_params' => [
-                    'apiKey' => env('FATTURA24_API_KEY'),
+                    'apiKey' => $configuration->fattura24_api_key, // Usa la chiave API salvata nel DB
                 ],
             ]);
 
@@ -34,37 +47,27 @@ class Fattura24Service
             $xml = simplexml_load_string($body);
 
             if ($xml === false) {
-                // Se c'è un errore nel parsing XML, visualizza l'errore
-                dd('Errore nel parsing XML: ', libxml_get_errors());
+                \Log::error('Errore nel parsing XML di TestKey: ', libxml_get_errors());
+                return 'Errore nel parsing della risposta XML.';
             }
 
-            // Converte l'oggetto XML in array per facilitare l'accesso ai dati
-            $json = json_encode($xml);
-            $array = json_decode($json, true);
-            dd($array);
-            // Ora possiamo accedere ai dati dei clienti e importarli
-            // Nota: Modifica questo in base alla struttura della risposta reale dei clienti
-            foreach ($array['customers'] as $customer) {
-                Customer::updateOrCreate([
-                    'email' => $customer['email'],
-                ], [
-                    'name' => $customer['name'],
-                    'fiscal_code' => $customer['fiscal_code'],
-                    'vat_number' => $customer['vat_number'],
-                    'billing_street' => $customer['billing_street'],
-                    'billing_city' => $customer['billing_city'],
-                    'billing_postal_code' => $customer['billing_postal_code'],
-                    'billing_province' => $customer['billing_province'],
-                    'billing_country' => $customer['billing_country'],
-                    'sdi_code' => $customer['sdi_code'],
-                    'pec_email' => $customer['pec_email'],
-                ]);
-            }
+            // Estrai i campi returnCode e description
+            $returnCode = (int) $xml->returnCode;
+            $description = (string) $xml->description;
 
-            return 'Clienti importati con successo';
+            // Controlla il valore di returnCode
+            if ($returnCode === 1) {
+                return "Test API Fattura24 riuscito: " . $description;
+            } elseif ($returnCode === -1) {
+                return "Errore: Chiave API non valida. " . $description;
+            } else {
+                return "Errore sconosciuto API Fattura24. Codice: " . $returnCode . " Descrizione: " . $description;
+            }
 
         } catch (\Exception $e) {
-            dd('Errore durante l\'importazione dei clienti: ', $e->getMessage());
+            \Log::error('Errore durante il test dell\'API Fattura24: ' . $e->getMessage());
+            return 'Errore durante il test dell\'API Fattura24: ' . $e->getMessage();
         }
     }
+
 }
