@@ -9,11 +9,25 @@ CloudwaysToFattura24 è un'applicazione sviluppata in Laravel che permette di ge
 Funzionalità principali
 -----------------------
 
-*   **Sincronizzazione dati da Cloudways:** Importa i dettagli dei server e delle applicazioni in modo automatico tramie API, visualizzando i dati in modo ordinato con DataTables. Non è possibile importare le mailbox di Rackspace in quanto Cloudways è sprovvista di un API specifica. E' necessario quindi procedere all'import tramite file csv.
-*   **Sincronizzazione clienti da Fattura24:** L'importazione dei clienti avviene tramite exporte del csv da Fattura24 ed import apposito form di upload sull'app. Purtroppo non è possibile importare la rubrica tramite API perchè Fattura24 è sprovvista di una API specifica.
+*   **Sincronizzazione dati da Cloudways:** Importa i dettagli dei server e delle applicazioni in modo automatico tramite API, visualizzando i dati in modo ordinato con DataTables. Non è possibile importare le mailbox di Rackspace in quanto Cloudways è sprovvista di un'API specifica. È necessario quindi procedere all'import tramite file CSV.
+*   **Sincronizzazione clienti da Fattura24:** L'importazione dei clienti avviene tramite export del CSV da Fattura24 ed import apposito form di upload sull'app. Purtroppo non è possibile importare la rubrica tramite API perché Fattura24 è sprovvista di un'API specifica.
 *   **Associazione clienti:** Associa ogni applicazione a un cliente specifico, in modo da avere sempre sotto controllo l'assegnazione dei servizi.
-*   **Creazione automatica di ordini su Fattura24:** Utilizzando le API di Fattura24, genera automaticamente ordini su Fattura24, risparmiando tempo e minimizzando errori manuali.
+*   **Creazione automatica di ordini su Fattura24:** Utilizzando le API di Fattura24, genera automaticamente ordini, risparmiando tempo e minimizzando errori manuali.
 *   **Gestione dei pagamenti:** Tiene traccia dello stato del pagamento per ogni ordine, inclusi dettagli come tipo di pagamento, data e ID. Aggiorna di conseguenza anche lo status dell'ordine.
+
+Demo Online
+-----------
+
+È disponibile una demo dell'applicazione online. Puoi accedervi con le seguenti credenziali:
+
+**Link alla demo:** [https://phplaravel-1168665-4968616.cloudwaysapps.com/](https://phplaravel-1168665-4968616.cloudwaysapps.com/)
+
+**Credenziali:**
+
+*   **Email:** demo@demo.it
+*   **Password:** demo@2024
+
+> **Nota:** Ricordati di cambiare le API e le password una volta terminato l'utilizzo della demo.
 
 Installazione
 -------------
@@ -22,15 +36,14 @@ Installazione
     
         git clone https://github.com/RiccardoRoscilli/CloudwaysToFattura24.git
     
-2.  Configura il file `.env` per connettere l'applicazione a Cloudways e Fattura24, specificando le rispettive chiavi API e altri dettagli necessari.
-3.  CLOUDWAYS\_API\_KEY, CLOUDWAYS\_EMAIL, FATTURA24\_API\_KEY
-4.  Installa le dipendenze:
+2.  Configura il file `.env` per connettere l'applicazione a Cloudways e Fattura24, specificando le rispettive chiavi API e altri dettagli necessari (CLOUDWAYS\_API\_KEY, CLOUDWAYS\_EMAIL, FATTURA24\_API\_KEY).
+    
+3.  Installa le dipendenze:
     
         composer install
-    
         npm install && npm run dev
     
-5.  Esegui le migrazioni per configurare il database:
+4.  Esegui le migrazioni per configurare il database:
     
         php artisan migrate
     
@@ -50,4 +63,4 @@ Se desideri contribuire al progetto, sentiti libero di creare pull request o di 
 Licenza
 -------
 
-Questo progetto è rilasciato sotto la licenza GNU GPL 2.0 Consulta il file `LICENSE` per maggiori dettagli.
+Questo progetto è rilasciato sotto la licenza GNU GPL 2.0. Consulta il file `LICENSE` per maggiori dettagli.
