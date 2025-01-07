@@ -21,7 +21,7 @@
                 <th>Platform</th>
                 <th>Cloud</th>
                 <th>Public IP</th>
-                <th>Azioni</th>
+               
             </tr>
         </thead>
     </table>
@@ -41,7 +41,7 @@ $(function() {
             { data: 'platform', name: 'platform' },
             { data: 'cloud', name: 'cloud' },
             { data: 'public_ip', name: 'public_ip' },
-            { data: 'action', name: 'action', orderable: false, searchable: false }
+          
         ]
     });
 });

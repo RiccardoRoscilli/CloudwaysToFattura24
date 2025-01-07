@@ -36,14 +36,15 @@ class ServerController extends Controller
 }
 
     // Metodo per restituire i dati in formato JSON per DataTables
-    public function getServersData()
+    public function getServersData(Request $request)
     {
-        $servers = Server::all(); // Recupera tutti i server
+        $dataTableController = new DataTableController();
 
-        return datatables()->of($servers)
-            ->addColumn('action', function ($server) {
-                return '<a href="/servers/' . $server->id . '/edit" class="btn btn-sm btn-primary">Modifica</a>';
-            })
-            ->make(true);
+        $query = Server::query()
+           // ->leftJoin('customers', 'servers.customer_id', '=', 'customers.id')
+            ->select('servers.*');
+        
+        // Usa DataTables per generare la risposta
+        return $dataTableController->getDataTable($request, $query);
     }
 }
