@@ -90,7 +90,7 @@ class ApplicationController extends Controller
         $dataTableController = new DataTableController();
 
         // Definisci la query con le relazioni tra applications e customers
-        $query = \App\Models\Application::query()
+        $query = Application::query()
             ->leftJoin('customers', 'applications.customer_id', '=', 'customers.id')
             ->select('applications.*', 'customers.name');
 

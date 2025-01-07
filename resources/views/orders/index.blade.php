@@ -57,7 +57,7 @@
                         searchable: false,
                         className: 'text-center',
                         render: function(data, type, row) {
-                            var disabledFattura24 = row.status === 'sent' ? 'disabled' : '';
+                            var disabledFattura24 = row.status === 'sentF24' ? 'disabled' : '';
                             return `
      
         <a href="/orders/${data}/edit" class="btn btn-sm btn-info">Modifica</a>
@@ -115,7 +115,10 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        alert(response.message); // Mostra un messaggio di successo
+                        //   alert(response.message); // Mostra un messaggio di successo
+                        table.ajax.reload(null,
+                        false); // False per mantenere la posizione della tabella
+
                     },
                     error: function(xhr) {
                         alert('Errore: ' + (xhr.responseJSON.message ||

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Dettagli Ordine</title>
     <style>
@@ -9,28 +10,35 @@
             border-collapse: collapse;
             margin-bottom: 20px;
         }
-        table th, table td {
+
+        table th,
+        table td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
+
         table th {
             background-color: #f2f2f2;
         }
-        h1, h2 {
+
+        h1,
+        h2 {
             font-family: Arial, sans-serif;
         }
+
         p {
             font-family: Arial, sans-serif;
             line-height: 1.6;
         }
     </style>
 </head>
-<body>
-    <h1>Gentile {{ $customer->name }}</h1>
-    <p>abbiamo emesso un ordine automatico per servizi di seguito elencati:</p>
 
-    <h2>Dettagli Ordine  {{ $orderId }}</h2>
+<body>
+    <h1>Spettabile {{ $customer->name }}</h1>
+    <p>abbiamo emesso un ordine automatico per i servizi di seguito elencati:</p>
+
+    <h2>Dettagli Ordine {{ $orderId }}</h2>
     <table>
         <thead>
             <tr>
@@ -61,14 +69,19 @@
             @endforeach
         </tbody>
     </table>
-
-    <p><strong>Totale Ordine:</strong> € {{ number_format($order->amount, 2) }}</p>
+    @php
+        $vatRate = 0.22; // Aliquota IVA 22%
+        $vatAmount = $order->amount * $vatRate;
+        $totalWithVat = $order->amount + $vatAmount;
+    @endphp
+    <p><strong>Totale Ordine (con IVA):</strong> € {{ number_format($totalWithVat, 2) }}</p>
     <p><strong>IBAN per il pagamento:</strong> {{ $paymentDetails }}</p>
     <p><strong>Conto Intestato a: Roscilli Riccardo</p>
-    <p><strong>Causale: Saldo ordine  {{ $orderId }} </p>
+    <p><strong>Causale: Saldo ordine {{ $orderId }} </p>
 
     <p>Per favore, proceda al pagamento utilizzando i dettagli sopra indicati.</p>
     <p>Una volta ricevuto il pagamento, verrà emessa la fattura elettronica.</p>
-    <p>Grazie,<br>Il Team</p>
+    <p>Cordiali Saluti,<br>PWS Staff</p>
 </body>
+
 </html>

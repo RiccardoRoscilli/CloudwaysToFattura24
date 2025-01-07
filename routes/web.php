@@ -7,6 +7,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DataTableController;
 use App\Http\Controllers\CloudwaysController;
 use App\Http\Controllers\ServerController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\MailboxController;
@@ -92,7 +93,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Rotte CRUD per i clienti
     Route::resource('customers', CustomerController::class);
-   
+    // services
+  
+    Route::resource('services', ServiceController::class);
+    Route::get('/datatable/service', [ServiceController::class, 'getServices'])->name('services.datatable');
+
     Route::post('/customers/{id}/addApplication', [CustomerController::class, 'addApplication'])->name('customers.addApplication');
     Route::get('/import-customers-form', function () {
         return view('import_customers_form');

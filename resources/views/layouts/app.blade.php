@@ -49,26 +49,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
 
 </head>
+
 <body>
-<!-- Aggiungi uno spazio di 20px al lato sinistro nella versione mobile senza modificare il colore di sfondo -->
+    <!-- Aggiungi uno spazio di 20px al lato sinistro nella versione mobile senza modificare il colore di sfondo -->
 
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
 
-                    {{  'Hosting App' }}
+                {{ 'Hosting App' }}
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('dashboard') }}">{{ __('Home') }}</a>
-                                </li>
-                                         <!-- Link ai clienti -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('dashboard') }}">{{ __('Home') }}</a>
+                        </li>
+                        <!-- Link ai clienti -->
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('customers.index') }}">{{ __('Clienti') }}</a>
                         </li>
@@ -80,6 +83,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('mailboxes.index') }}">Mailboxes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('services.index') }}">Services</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('orders.index') }}">Orders</a>
@@ -103,7 +109,8 @@
                             @endif
                         @else
                             <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}
                                 </a>
 
@@ -114,7 +121,7 @@
                                     </a>
 
                                     <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
+                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
@@ -149,4 +156,5 @@
         }, 2000); // Nasconde dopo 2 secondi (2000 millisecondi)
     });
 </script>
+
 </html>

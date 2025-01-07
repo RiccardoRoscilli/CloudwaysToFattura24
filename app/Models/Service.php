@@ -12,8 +12,16 @@ class Service extends Model
         'name',
         'description',
         'price',
-        'expiration_date',
+        'expiry_date',
         'is_active', // Aggiunto
+        'customer_id',
+        'service_name',
+        'service_type',
+        'billing_frequency',
+        'is_active',
+        'authinfo',
+        'status'
+
     ];
     // Relazione con Customer
     public function customer()

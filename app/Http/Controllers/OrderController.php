@@ -342,21 +342,28 @@ class OrderController extends Controller
         try {
             $order = Order::with('customer', 'items')->findOrFail($orderId);
             $customer = $order->customer;
-    
+
             if (!$customer) {
                 return response()->json(['success' => false, 'message' => 'Cliente non trovato.'], 404);
             }
-           
+
+            $items = $order->items;
+
             // Invia la mail
-            \Mail::to($customer->email)->send(new \App\Mail\PaymentInstructions($customer, $order));
-    
+            \Mail::to($customer->email)
+            ->bcc('riccardo.roscilli@gmail.com') // Indirizzo in copia nascosta
+            ->send(new \App\Mail\PaymentInstructions($customer, $order, $items));
+        
+            // Aggiorna lo stato dell'ordine a 'mailed'
+            $order->update(['status' => 'mailed']);
+
             return response()->json(['success' => true, 'message' => 'Email inviata con successo!']);
         } catch (\Exception $e) {
             \Log::error('Errore durante l\'invio della mail:', ['error' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => 'Errore durante l\'invio della mail.'], 500);
         }
     }
-    
+
 
     function arrayToXml($data, &$xmlData)
     {

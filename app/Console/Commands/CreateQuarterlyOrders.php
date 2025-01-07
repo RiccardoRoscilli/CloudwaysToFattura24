@@ -25,6 +25,7 @@ class CreateQuarterlyOrders extends Command
 
     public function handle()
     {
+         
         $currentDate = Carbon::now();
         $currentQuarterStart = Carbon::create($currentDate->year, ceil($currentDate->month / 3) * 3 - 2, 1);
         $currentQuarterEnd = $currentQuarterStart->copy()->addMonths(3)->subDay();
@@ -32,8 +33,9 @@ class CreateQuarterlyOrders extends Command
         $totalOrdersCreated = 0;
 
         $customers = Customer::with(['applications', 'services', 'mailBoxes'])->get();
-
+        
         foreach ($customers as $customer) {
+            
             $orderItems = [];
 
             // Aggiungi applicazioni come OrderItem
@@ -98,7 +100,7 @@ class CreateQuarterlyOrders extends Command
                     } else {
                         $this->info("Il servizio {$service->id} del cliente {$customer->id} non scade nel trimestre corrente.");
                     }
-                } else {
+                } elseif ($service->billing_frequency === 'quarterly') {
                     $existingOrderItem = OrderItem::where('service_type', 'service')
                         ->where('service_id', $service->id)
                         ->where('start_date', $currentQuarterStart)
@@ -110,20 +112,35 @@ class CreateQuarterlyOrders extends Command
                         continue;
                     }
 
+                    // Calcola il costo per il trimestre
+                    $quarterlyPrice = ($service->price ?? 0) * 3;
+
                     $orderItems[] = new OrderItem([
                         'service_type' => 'service',
                         'service_id' => $service->id,
-                        'price' => $service->price ?? 0,
+                        'price' => $quarterlyPrice,
                         'billing_frequency' => 'quarterly',
                         'start_date' => $currentQuarterStart,
                         'end_date' => $currentQuarterEnd,
                     ]);
                 }
-
             }
+
 
             // Aggiungi mailbox come OrderItem
             foreach ($customer->mailBoxes as $mailbox) {
+                // Controlla se l'OrderItem esiste già
+                $existingOrderItem = OrderItem::where('service_type', 'mailbox')
+                    ->where('service_id', $mailbox->id)
+                    ->where('start_date', $currentQuarterStart)
+                    ->where('end_date', $currentQuarterEnd)
+                    ->exists();
+
+                if ($existingOrderItem) {
+                    $this->info("Ordine già esistente per la mailbox {$mailbox->id} del cliente {$customer->id}.");
+                    continue;
+                }
+
                 $orderItems[] = new OrderItem([
                     'service_type' => 'mailbox',
                     'service_id' => $mailbox->id,
@@ -133,6 +150,7 @@ class CreateQuarterlyOrders extends Command
                     'end_date' => $currentQuarterEnd,
                 ]);
             }
+
 
             // Crea l'ordine solo se ci sono OrderItems
             if (!empty($orderItems)) {
