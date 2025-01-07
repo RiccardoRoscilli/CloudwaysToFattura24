@@ -2,84 +2,143 @@
 
 @section('content')
     <div class="container">
-        <h1>{{ isset($order) ? 'Modifica Ordine' : 'Crea Nuovo Ordine' }}</h1>
+        <h1>Dettagli Ordine</h1>
 
-        <!-- Form per creare/modificare un ordine -->
-        <form action="{{ isset($order) ? route('orders.update', $order->id) : route('orders.store') }}" method="POST">
-            @csrf
-            @if(isset($order))
-                @method('PUT')
-            @endif
+        <!-- Dati generali dell'ordine -->
+        <div class="mb-4">
+            <h3 class="mb-3">Informazioni Generali</h3>
+            <table class="table table-hover table-sm align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Informazione</th>
+                        <th>Dettaglio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Cliente</th>
+                        <td>{{ $order->customer->name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email Cliente</th>
+                        <td>{{ $order->customer->email }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Stato</th>
+                        <td>
+                            <div class="form-group">
+                                <select id="order-status" class="form-select form-select-sm w-auto">
+                                    <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending
+                                    </option>
+                                    <option value="sent" {{ $order->status === 'sent' ? 'selected' : '' }}>Inviato
+                                    </option>
+                                    <option value="complete" {{ $order->status === 'complete' ? 'selected' : '' }}>
+                                        Completato</option>
+                                </select>
 
-            <div class="row">
-                <!-- Prima colonna -->
-                <div class="col-md-6">
-                    <!-- Selezione dell'applicazione -->
-                    <div class="mb-3">
-                        <label for="application_id" class="form-label">Applicazione</label>
-                        <select class="form-control" name="application_id" id="application_id" required>
-                            @foreach($applications as $application)
-                                <option value="{{ $application->id }}" {{ isset($order) && $order->application_id == $application->id ? 'selected' : '' }}>
-                                    {{ $application->label }} - {{ $application->application }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Totale</th>
+                        <td id="order-total">€ {{ number_format($order->amount, 2) }}</td>
+                    </tr>
+                </tbody>
+            </table>
 
-                    <!-- Campo per l'importo dell'ordine -->
-                    <div class="mb-3">
-                        <label for="amount" class="form-label">Importo</label>
-                        <input type="number" class="form-control" name="amount" id="amount" value="{{ old('amount', isset($order) ? $order->amount : '') }}" required>
-                    </div>
+        </div>
 
-                    <!-- Data di pagamento -->
-                    <div class="mb-3">
-                        <label for="payment_date" class="form-label">Data di Pagamento</label>
-                        <input type="date" class="form-control" name="payment_date" id="payment_date" value="{{ old('payment_date', isset($order) ? $order->payment_date->format('Y-m-d') : '') }}">
-                    </div>
-                </div>
+        <!-- Elenco delle applicazioni, servizi e mailbox associati -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo</th>
+                    <th>Nome</th>
+                    <th>Descrizione</th>
+                    <th>Prezzo</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($order->items as $item)
+                    <tr id="item-{{ $item->id }}">
+                        <td>{{ $item->id }}</td>
+                        <td>{{ ucfirst($item->service_type) }}</td>
+                        <td>
+                            @if ($item->service_type === 'application')
+                                {{ $item->application->label ?? 'N/A' }}
+                            @elseif ($item->service_type === 'mailbox')
+                                {{ $item->mailbox->email ?? 'N/A' }}
+                            @else
+                                {{ $item->service->service_name ?? 'N/A' }}
+                            @endif
+                        </td>
+                        <td>
+                            @if ($item->service_type === 'application')
+                                Application
+                            @elseif ($item->service_type === 'mailbox')
+                                {{ $item->mailbox->email ?? 'N/A' }}
+                            @else
+                                {{ ucfirst($item->service->service_type) ?? 'N/A' }}
+                            @endif
+                        </td>
+                        <td>
+                            € <input type="number" id="price-input-{{ $item->id }}" value="{{ $item->price }}"
+                                step="0.01" class="form-control form-control-sm w-auto d-inline">
+                        </td>
 
-                <!-- Seconda colonna -->
-                <div class="col-md-6">
-                    <!-- Data di Inizio e Data di Fine sulla stessa riga -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="start_date" class="form-label">Data di Inizio</label>
-                            <input type="date" class="form-control" name="start_date" id="start_date" value="{{ old('start_date', isset($order) ? $order->start_date->format('Y-m-d') : '') }}" required>
-                        </div>
+                        <td>
+                            <button class="btn btn-primary save-price" data-item-id="{{ $item->id }}">Salva
+                                prezzo</button>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="end_date" class="form-label">Data di Fine</label>
-                            <input type="date" class="form-control" name="end_date" id="end_date" value="{{ old('end_date', isset($order) ? $order->end_date->format('Y-m-d') : '') }}" required>
-                        </div>
-                    </div>
-
-                    <!-- Tipo di pagamento -->
-                    <div class="mb-3">
-                        <label for="payment_type" class="form-label">Tipo di Pagamento</label>
-                        <input type="text" class="form-control" name="payment_type" id="payment_type" value="{{ old('payment_type', isset($order) ? $order->payment_type : '') }}" required>
-                    </div>
-
-                    <!-- ID pagamento -->
-                    <div class="mb-3">
-                        <label for="payment_id" class="form-label">ID Pagamento</label>
-                        <input type="text" class="form-control" name="payment_id" id="payment_id" value="{{ old('payment_id', isset($order) ? $order->payment_id : '') }}">
-                    </div>
-
-                    <!-- Stato -->
-                    <div class="mb-3">
-                        <label for="status" class="form-label">Stato</label>
-                        <select class="form-control" name="status" id="status" required>
-                            <option value="pending" {{ isset($order) && $order->status == 'pending' ? 'selected' : '' }}>In Attesa</option>
-                            <option value="paid" {{ isset($order) && $order->status == 'paid' ? 'selected' : '' }}>Pagato</option>
-                            <option value="cancelled" {{ isset($order) && $order->status == 'cancelled' ? 'selected' : '' }}>Annullato</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pulsante di invio -->
-            <button type="submit" class="btn btn-primary">{{ isset($order) ? 'Salva Modifiche' : 'Crea Ordine' }}</button>
-        </form>
+        <!-- Pulsanti Azione -->
+        <div>
+            <a href="{{ route('orders.index') }}" class="btn btn-secondary">Torna alla Lista Ordini</a>
+        </div>
     </div>
+
+    <script>
+        document.querySelectorAll('.save-price').forEach((button) => {
+            button.addEventListener('click', function() {
+                const itemId = this.dataset.itemId;
+                const priceInput = document.querySelector(`#price-input-${itemId}`);
+
+                if (!itemId || !priceInput) {
+                    console.error('ID o input prezzo non trovati.');
+                    return;
+                }
+
+                fetch(`/order-items/${itemId}/updatePrice`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({
+                            price: priceInput.value,
+                            status: document.querySelector('#order-status')
+                            .value, // Invia anche lo stato
+                        }),
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            alert('Prezzo aggiornato con successo!');
+                        } else {
+                            alert('Errore: ' + data.message);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Errore durante la richiesta:', error);
+                        alert('Errore durante la richiesta.');
+                    });
+            });
+        });
+    </script>
 @endsection

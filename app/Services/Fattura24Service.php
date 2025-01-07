@@ -4,6 +4,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
+use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Configuration; // Aggiungi questa linea
 
@@ -70,4 +71,56 @@ class Fattura24Service
         }
     }
 
+    public function sendOrder(Order $order, string $apiKey): array
+    {
+        $totalWithoutTax = 0;
+        foreach ($order->items as $item) {
+            $quantity = $item->billing_frequency === 'quarterly' ? 3 : 1;
+            $totalWithoutTax += $item->price * $quantity;
+        }
+        $vatAmount = $totalWithoutTax * 0.22;
+        $totalWithTax = $totalWithoutTax + $vatAmount;
+
+        $xml = new SimpleXMLElement('<?xml version="1.0"?><Fattura24></Fattura24>');
+        $document = $xml->addChild('Document');
+        $document->addChild('CustomerName', htmlspecialchars($order->customer->name ?? 'N/A'));
+        $document->addChild('TotalWithoutTax', number_format($totalWithoutTax, 2, '.', ''));
+        $document->addChild('Total', number_format($totalWithTax, 2, '.', ''));
+
+        $rows = $document->addChild('Rows');
+        foreach ($order->items as $item) {
+            $row = $rows->addChild('Row');
+            $row->addChild('Description', htmlspecialchars($item->description ?? 'N/A'));
+            $row->addChild('Price', number_format($item->price, 2, '.', ''));
+            $row->addChild('Qty', $item->billing_frequency === 'quarterly' ? 3 : 1);
+            $row->addChild('VatCode', '22');
+        }
+
+        $xmlString = $xml->asXML();
+
+        $client = new Client();
+        $response = $client->post('https://www.app.fattura24.com/api/v0.3/SaveDocument', [
+            'form_params' => [
+                'apiKey' => $apiKey,
+                'xml' => $xmlString,
+            ],
+        ]);
+
+        $responseXml = simplexml_load_string($response->getBody()->getContents());
+
+        if ((string)$responseXml->returnCode === '0') {
+            $order->update(['status' => 'sent']);
+            return [
+                'success' => true,
+                'docId' => (string)$responseXml->docId,
+                'docNumber' => (string)$responseXml->docNumber,
+                'description' => (string)$responseXml->description,
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => (string)$responseXml->description,
+            ];
+        }
+    }
 }

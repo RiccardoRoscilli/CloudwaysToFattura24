@@ -73,6 +73,7 @@ class CloudwaysController extends Controller
 
             // Inserisci o aggiorna le applicazioni associate
             foreach ($serverData['apps'] as $appData) {
+               
                 Application::updateOrCreate(
                     [
                         'cloudways_app_id' => $appData['id'], // ID univoco dell'application di Cloudways
@@ -95,7 +96,7 @@ class CloudwaysController extends Controller
                         'mysql_password' => $appData['mysql_password'] ?? null,
                         'webroot' => $appData['webroot'] ?? null,
                         'is_csr_available' => $appData['is_csr_available'] ?? false,
-                        'lets_encrypt' => $appData['lets_encrypt'] ?? null,
+                        'lets_encrypt' => json_encode($appData['lets_encrypt']) ?? null,
                     ]
                 );
             }

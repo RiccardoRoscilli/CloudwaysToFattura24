@@ -24,12 +24,25 @@ class ConfigurationController extends Controller
         // Recupera l'utente autenticato
         $user = auth()->user();
 
-        // Recupera la configurazione dell'utente
-        $configuration = \App\Models\Configuration::where('user_id', $user->id)->first();
+        // Recupera o inizializza una configurazione vuota per l'utente
+        $configuration = \App\Models\Configuration::firstOrNew(
+            ['user_id' => $user->id], // Condizione per il record
+            [ // Valori predefiniti se il record non esiste
+                'mail_mailer' => 'smtp',
+                'mail_host' => '',
+                'mail_port' => '',
+                'mail_username' => '',
+                'mail_password' => '',
+                'mail_encryption' => '',
+                'mail_from_address' => '',
+                'mail_from_name' => '',
+            ]
+        );
 
         // Passa la configurazione alla vista
         return view('configuration.edit', compact('configuration'));
     }
+
 
 
     public function update(Request $request)
@@ -83,7 +96,7 @@ class ConfigurationController extends Controller
     public function testCloudwaysApi(Request $request)
     {
         // Chiamata al servizio per autenticarsi con Cloudways
-        $token =  $this->cloudwaysService->authenticate();
+        $token = $this->cloudwaysService->authenticate();
 
 
         Log::info('Risposta dall\'API Cloudways:' . $token); // Questo loggherà la risposta come array
@@ -92,7 +105,7 @@ class ConfigurationController extends Controller
         if (strpos($token, 'Client error') !== false) {
             return response()->json(['message' => 'Errore durante l\'autenticazione. Token: ' . $token]);
         } elseif (strpos($token, 'Errore') !== false) {
-            return response()->json(['message' =>  $token]);
+            return response()->json(['message' => $token]);
         } else {
             return response()->json(['message' => 'Autenticazione riuscita, token: ' . $token], 400);
         }

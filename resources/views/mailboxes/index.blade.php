@@ -11,6 +11,13 @@
     @endif
 
     <div class="container mt-0">
+        <!-- Pulsante per creare una nuova mailbox -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Gestione Mailbox</h2>
+            <a href="{{ route('mailboxes.create') }}" class="btn btn-success">Crea Nuova Mailbox</a>
+        </div>
+
+        <!-- Tabella delle mailbox -->
         <table class="table table-bordered yajra-datatable" style="width: 100%;">
             <thead>
                 <tr>
@@ -61,11 +68,10 @@
                         name: 'SMTPport'
                     },
                     {
-                        data: 'customer_name',
+                        data: 'name',
                         name: 'customers.name',
                         render: function(data, type, row) {
-                            return data ? data :
-                            'Nessun cliente'; // Mostra 'Nessun cliente' se customer è null
+                            return data ? data : 'Nessun cliente'; // Mostra 'Nessun cliente' se customer è null
                         }
                     },
                     {
@@ -74,11 +80,16 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            return '<a href="/mailboxes/' + data +
-                                '" class="btn btn-sm btn-primary">Associa Cliente</a>';
+                            return `
+                                <a href="/mailboxes/${data}/edit" class="btn btn-sm btn-info">Modifica</a>
+                                <form action="/mailboxes/${data}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questa mailbox?')">Elimina</button>
+                                </form>
+                            `;
                         }
                     }
-
                 ]
             });
         });

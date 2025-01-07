@@ -18,12 +18,17 @@ class MailboxController extends Controller
     }
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $customers = Customer::all();
+        return view('mailboxes.edit', compact('customers'));
+    }
+
+    public function edit($id)
+    {
+        $mailbox = Mailbox::findOrFail($id);
+        $customers = Customer::all();
+        return view('mailboxes.edit', compact('mailbox', 'customers'));
     }
 
     /**
@@ -31,25 +36,22 @@ class MailboxController extends Controller
      */
     public function store(Request $request)
     {
+        // Validazione dei dati
         $validatedData = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
             'customer_id' => 'required|exists:customers,id',
-            // Non serve più richiedere server, IMAPport e SMTPport
+            'email' => 'required|email|unique:mailboxes,email',
+            'server' => 'required|string|max:255',
+            'IMAPport' => 'required|integer|min:1',
+            'SMTPport' => 'required|integer|min:1',
         ]);
 
-        // I valori per server, IMAPport, SMTPport vengono inseriti automaticamente con il default se non sono presenti
-        MailBox::create([
-            'email' => $validatedData['email'],
-            'password' => $validatedData['password'],
-            'customer_id' => $validatedData['customer_id'],
-            'server' => $request->input('server', 'secure.emailsrvr.com'), // default dal DB, sovrascrivibile
-            'IMAPport' => $request->input('IMAPport', 993), // default dal DB, sovrascrivibile
-            'SMTPport' => $request->input('SMTPport', 465), // default dal DB, sovrascrivibile
-        ]);
+        // Creazione della nuova mailbox
+        Mailbox::create($validatedData);
 
-        return redirect()->route('mail-boxes.index')->with('success', 'MailBox creata con successo');
+        // Reindirizzamento alla lista delle mailbox con un messaggio di successo
+        return redirect()->route('mailboxes.index')->with('success', 'Mailbox creata con successo!');
     }
+
 
     /**
      * Display the specified resource.
@@ -83,37 +85,32 @@ class MailboxController extends Controller
         return redirect()->route('mailboxes.index')->with('success', 'MailBox associata con successo!');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, MailBox $mailBox)
+    public function update(Request $request, $id)
     {
+        // Recupera la mailbox esistente
+        $mailbox = Mailbox::findOrFail($id);
+
+        // Validazione dei dati
         $validatedData = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
             'customer_id' => 'required|exists:customers,id',
+            'email' => 'required|email|unique:mailboxes,email,' . $mailbox->id, // Ignora l'email della mailbox corrente
+            'server' => 'required|string|max:255',
+            'IMAPport' => 'required|integer|min:1',
+            'SMTPport' => 'required|integer|min:1',
         ]);
 
-        // I valori per server, IMAPport, SMTPport vengono aggiornati o mantengono il default
-        $mailBox->update([
-            'email' => $validatedData['email'],
-            'password' => $validatedData['password'],
-            'customer_id' => $validatedData['customer_id'],
-            'server' => $request->input('server', $mailBox->server), // Mantiene il valore esistente o sovrascrive
-            'IMAPport' => $request->input('IMAPport', $mailBox->IMAPport),
-            'SMTPport' => $request->input('SMTPport', $mailBox->SMTPport),
-        ]);
+        // Aggiornamento della mailbox
+        $mailbox->update($validatedData);
 
-        return redirect()->route('mail-boxes.index')->with('success', 'MailBox aggiornata con successo');
+        // Reindirizzamento alla lista delle mailbox con un messaggio di successo
+        return redirect()->route('mailboxes.index')->with('success', 'Mailbox aggiornata con successo!');
     }
+
 
 
     /**
@@ -126,18 +123,15 @@ class MailboxController extends Controller
 
     public function getMailboxes(Request $request)
     {
-        $query = MailBox::with('customer') // Carica i dati del cliente associato
-            ->leftJoin('customers', 'mailboxes.customer_id', '=', 'customers.id') // Effettua il join con la tabella customers
-            ->select('mailboxes.*', 'customers.name as customer_name'); // Seleziona i campi necessari
+        $dataTableController = new DataTableController();
 
-        return datatables()->of($query)
-            ->addColumn('customer_name', function ($mailbox) {
-                return $mailbox->customer_name ? $mailbox->customer_name : 'Nessun cliente';
-            })
-            ->addColumn('action', function ($mailbox) {
-                return '<a href="/mailboxes/' . $mailbox->id . '/edit" class="btn btn-sm btn-primary">Modifica</a>';
-            })
-            ->make(true);
+        // Definisci la query con le relazioni tra mailboxes e customers
+        $query = Mailbox::query()
+            ->leftJoin('customers', 'mailboxes.customer_id', '=', 'customers.id')
+            ->select('mailboxes.*', 'customers.name'); // Alias corretto per la colonna customer_name
+
+        // Chiama il metodo generico del DataTableController
+        return $dataTableController->getDataTable($request, $query);
     }
 
 }

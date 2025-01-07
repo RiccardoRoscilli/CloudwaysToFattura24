@@ -37,23 +37,24 @@ class ApplicationController extends Controller
         return view('applications.edit', compact('application', 'customers'));
     }
 
-    public function update(Request $request, Application $application)
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'label' => 'required|string|max:255',
-            'application' => 'required|string',
-            'app_version' => 'required|string',
-            'app_fqdn' => 'required|string',
-            'sys_user' => 'required|string',
-            'app_user' => 'required|string',
-            'app_password' => 'required|string',
-            'sys_password' => 'required|string',
+      
+        $application = Application::findOrFail($id);
+         
+        // Validazione del campo prezzo
+        $request->validate([
+            'price' => 'required|numeric|min:0',
         ]);
-
-        $application->update($validated);
-
-        return redirect()->route('applications.index')->with('success', 'Application aggiornata con successo');
+    
+        // Aggiorna il prezzo
+        $application->update($request->only(['price']));
+    
+        // Reindirizza alla vista index con un messaggio di successo
+        return redirect()->route('applications.index')
+                         ->with('success', 'Prezzo aggiornato con successo.');
     }
+    
 
     public function associate($id)
     {

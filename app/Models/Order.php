@@ -17,16 +17,21 @@ class Order extends Model
         'payment_id',
         'payment_date',
         'status',
+        'customer_id',
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
 
     public function application()
     {
         return $this->belongsTo(Application::class);
     }
-
-    public function customer()
+    public function items()
     {
-        return $this->hasOneThrough(Customer::class, Application::class, 'id', 'id', 'application_id', 'customer_id');
+        return $this->hasMany(OrderItem::class);
     }
 }
 

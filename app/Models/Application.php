@@ -30,6 +30,7 @@ class Application extends Model
         'app_version_id',
         'cms_app_id',
         'customer_id',
+        'price'
     ];
 
 

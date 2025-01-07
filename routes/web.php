@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerController;
+
 use App\Http\Controllers\DataTableController;
 use App\Http\Controllers\CloudwaysController;
 use App\Http\Controllers\ServerController;
@@ -10,6 +11,9 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\MailboxController;
 use App\Http\Controllers\ConfigurationController;
+use App\Mail\PaymentInstructions;
+use App\Models\Customer;
+use App\Models\Order;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -42,9 +46,28 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/preview-payment-email/{orderId}', function ($orderId) {
+    // Carica l'ordine con il cliente associato
+    $order = Order::with('customer')->find($orderId);
+
+    if (!$order) {
+        abort(404, 'Ordine non trovato.');
+    }
+
+    $customer = $order->customer;
+
+    if (!$customer) {
+        abort(404, 'Cliente non trovato.');
+    }
+
+    return new \App\Mail\PaymentInstructions($customer, $order);
+});
 
 // rotte protette per l'admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
+
+    Route::post('/orders/{order}/sendMail', [OrderController::class, 'sendMail'])->name('orders.sendMail');
+
 
     Route::get('/configuration/edit', [ConfigurationController::class, 'edit'])->name('configuration.edit');
     Route::post('/configuration/update', [ConfigurationController::class, 'update'])->name('configuration.update');
@@ -64,17 +87,22 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/applications/data', [ApplicationController::class, 'getApplicationsData'])->name('applications.data');
     Route::get('/applications/{application}/edit', [ApplicationController::class, 'edit'])->name('applications.edit');
     Route::post('/applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
+    Route::put('/applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
+
+
     // Rotte CRUD per i clienti
     Route::resource('customers', CustomerController::class);
-    Route::get('/customers/{id}', [CustomerController::class, 'show'])->name('customers.show');
+   
     Route::post('/customers/{id}/addApplication', [CustomerController::class, 'addApplication'])->name('customers.addApplication');
     Route::get('/import-customers-form', function () {
         return view('import_customers_form');
     })->name('import.customers.form');
 
+
     Route::resource('orders', OrderController::class);
     // pulsante invio a f24
     Route::post('/orders/{order}/sendToFattura24', [OrderController::class, 'sendToFattura24'])->name('orders.sendToFattura24');
+    Route::post('/order-items/{item}/updatePrice', [OrderController::class, 'updatePrice'])->name('orderItems.update');
 
     // test configurazione api
     Route::post('/test/cloudways-api', [ConfigurationController::class, 'testCloudwaysApi'])->name('test.cloudways.api');
@@ -94,7 +122,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             return app()->call([$controllerInstance, $method]); // Chiama il metodo sull'istanza
         }
 
-        abort(404, 'Controller ' . $controllerClass . ' o metodo ' .  $method . ' non trovato');
+        abort(404, 'Controller ' . $controllerClass . ' o metodo ' . $method . ' non trovato');
     })->name('datatable.generic');
 
     // associazioni servizi con clienti

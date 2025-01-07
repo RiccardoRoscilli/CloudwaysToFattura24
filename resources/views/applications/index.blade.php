@@ -18,6 +18,7 @@
                     <th>Versione</th>
                     <th>Server ID</th>
                     <th>Cliente Associato</th>
+                    <th>Prezzo</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
@@ -54,6 +55,10 @@
                             return data ? data :
                                 'Nessun cliente'; // Mostra 'Nessun cliente' se customer è null
                         }
+                    },
+                     {
+                        data: 'price',
+                        name: 'price'
                     },
                     {
                         data: 'id', // ID dell'applicazione

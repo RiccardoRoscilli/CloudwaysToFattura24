@@ -11,66 +11,74 @@
     @endif
 
     <div class="container mt-0">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <a href="{{ route('orders.create') }}" class="btn btn-primary">Nuovo Ordine</a>
-        </div>
-
         <table class="table table-bordered yajra-datatable" style="width: 100%;">
             <thead>
                 <tr>
-
-                    <th>Applicazione</th>
                     <th>Cliente</th>
-                    <th>Importo</th>
-                    <th>Status</th>
+                    <th>Totale</th>
+                    <th>Stato</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+            </tbody>
         </table>
     </div>
 
     <script type="text/javascript">
         $(function() {
-            var entity = 'order'; // oppure 'application', 'customer', ecc.
+            var entity = 'order';
             var url = "/datatable/" + entity;
+
             var table = $('.yajra-datatable').DataTable({
                 processing: true,
+                stateSave: true,
                 serverSide: true,
                 ajax: url,
                 columns: [{
-                        data: 'label',
-                        name: 'label'
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
+                        data: 'name', // Assumendo che ci sia un campo customer_name o simile
+                        name: 'name',
+                        title: 'Cliente'
                     },
                     {
                         data: 'amount',
-                        name: 'amount'
+                        name: 'orders.amount',
+                        title: 'Totale'
                     },
                     {
                         data: 'status',
-                        name: 'status'
+                        name: 'orders.status',
+                        title: 'Stato'
                     },
                     {
-                        data: 'action',
-                        name: 'action',
+                        data: 'id', // Usa 'id' dell'ordine per i pulsanti di azione
+                        name: 'orders.id',
                         orderable: false,
                         searchable: false,
+                        className: 'text-center',
                         render: function(data, type, row) {
+                            var disabledFattura24 = row.status === 'sent' ? 'disabled' : '';
                             return `
-                            <a href="/orders/${row.id}/edit" class="btn btn-primary btn-sm">Modifica</a>
-                            <button class="btn btn-success btn-sm send-to-fattura24" data-order-id="${row.id}">Invia a F24</button>
-                        `;
+     
+        <a href="/orders/${data}/edit" class="btn btn-sm btn-info">Modifica</a>
+        <button class="btn btn-sm btn-success send-to-fattura24" 
+                data-order-id="${data}" ${disabledFattura24}>
+            Invia a Fattura24
+        </button>
+        <button class="btn btn-sm btn-warning send-mail" 
+                data-order-id="${data}">
+            Invia Mail
+        </button>
+    `;
                         }
                     }
                 ]
             });
-            // Aggiungi l'handler per il click sul pulsante "Invia a F24"
+
+            // Gestione del pulsante per inviare a Fattura24
             $(document).on('click', '.send-to-fattura24', function() {
                 var orderId = $(this).data('order-id');
+                var button = $(this); // Riferimento al pulsante cliccato
 
                 $.ajax({
                     url: '/orders/' + orderId + '/sendToFattura24',
@@ -79,10 +87,39 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        alert(response.message);
+                        // Mostra un messaggio di successo
+                        // alert(response.message);
+
+                        // Ricarica la tabella per riflettere i cambiamenti
+                        table.ajax.reload(null,
+                            false); // False per non riposizionare la tabella
+
+                        // Disabilita il pulsante specifico
+                        button.prop('disabled', true);
                     },
                     error: function(xhr) {
-                        alert('Errore: ' + xhr.responseJSON.message);
+                        alert('Errore: ' + (xhr.responseJSON.message ||
+                            'Qualcosa è andato storto.'));
+                    }
+                });
+            });
+            // invio email 
+            $(document).on('click', '.send-mail', function() {
+                var orderId = $(this).data('order-id');
+                var button = $(this); // Riferimento al pulsante cliccato
+
+                $.ajax({
+                    url: '/orders/' + orderId + '/sendMail',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        alert(response.message); // Mostra un messaggio di successo
+                    },
+                    error: function(xhr) {
+                        alert('Errore: ' + (xhr.responseJSON.message ||
+                            'Qualcosa è andato storto.'));
                     }
                 });
             });

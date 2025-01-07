@@ -137,12 +137,13 @@ class CustomerController extends Controller
     // CRUD: Aggiorna un cliente esistente nel database
     public function update(Request $request, Customer $customer)
     {
+        
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email,' . $customer->id,
+            // 'email' => 'required|email|unique:customers,email,' . $customer->id,
             // Aggiungi ulteriori validazioni qui
         ]);
-
+    
         $customer->update($request->all());
 
         return redirect()->route('customers.index')->with('success', 'Cliente aggiornato con successo.');
