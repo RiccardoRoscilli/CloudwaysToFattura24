@@ -94,7 +94,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Rotte CRUD per i clienti
     Route::resource('customers', CustomerController::class);
     // services
-  
+
     Route::resource('services', ServiceController::class);
     Route::get('/datatable/service', [ServiceController::class, 'getServices'])->name('services.datatable');
 
@@ -103,12 +103,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         return view('import_customers_form');
     })->name('import.customers.form');
 
-
+    Route::get('/orders/in-progress', [OrderController::class, 'inProgress'])->name('orders.in_progress');
+    Route::get('/orders/complete', [OrderController::class, 'complete'])->name('orders.complete');
+    
+    // Rotte resource (dopo quelle specifiche)
     Route::resource('orders', OrderController::class);
-    // pulsante invio a f24
+    
+    // Pulsante invio a Fattura24
     Route::post('/orders/{order}/sendToFattura24', [OrderController::class, 'sendToFattura24'])->name('orders.sendToFattura24');
     Route::post('/order-items/{item}/updatePrice', [OrderController::class, 'updatePrice'])->name('orderItems.update');
-
+    
     // test configurazione api
     Route::post('/test/cloudways-api', [ConfigurationController::class, 'testCloudwaysApi'])->name('test.cloudways.api');
     Route::post('/test/fattura24-api', [ConfigurationController::class, 'testFattura24Api'])->name('test.fattura24.api');

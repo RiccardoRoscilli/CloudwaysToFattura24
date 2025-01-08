@@ -136,16 +136,39 @@ class OrderController extends Controller
     public function getOrders(Request $request)
     {
         $dataTableController = new DataTableController();
-
+         
         // Definisci la query con le relazioni tra applications e customers
         $query = Order::query()
             ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
             ->select('orders.*', 'customers.name');
+        // Applica il filtro per status se presente nella richiesta
+        if ($request->has('status') && !empty($request->status)) {
+            if ($request->status == 'not_complete') {
 
+                // Filtra tutti gli status diversi da 'complete'
+                $query->whereNotIn('orders.status', ['complete']);
+                 
+            } else {
+                // Filtra per status specifico
+                $query->where('orders.status', $request->status);
+            }
+        }
         // Chiama il metodo generico del DataTableController
         return $dataTableController->getDataTable($request, $query);
     }
 
+
+    public function inProgress()
+    {
+        $orders = Order::where('status', 'in_progress')->paginate(10);
+        return view('orders.in_progress', compact('orders'));
+    }
+
+    public function complete()
+    {
+        $orders = Order::where('status', 'complete')->paginate(10);
+        return view('orders.complete', compact('orders'));
+    }
 
 
     public function testApiKey()
@@ -351,9 +374,9 @@ class OrderController extends Controller
 
             // Invia la mail
             \Mail::to($customer->email)
-            ->bcc('riccardo.roscilli@gmail.com') // Indirizzo in copia nascosta
-            ->send(new \App\Mail\PaymentInstructions($customer, $order, $items));
-        
+                ->bcc('riccardo.roscilli@gmail.com') // Indirizzo in copia nascosta
+                ->send(new \App\Mail\PaymentInstructions($customer, $order, $items));
+
             // Aggiorna lo stato dell'ordine a 'mailed'
             $order->update(['status' => 'mailed']);
 

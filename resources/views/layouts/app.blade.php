@@ -87,9 +87,21 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('services.index') }}">Services</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('orders.index') }}">Orders</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="ordersDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Orders
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="ordersDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('orders.in_progress') }}">In Progress</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('orders.complete') }}">Complete</a>
+                                </li>
+                            </ul>
                         </li>
+
                     </ul>
 
                     <!-- Right Side Of Navbar -->
