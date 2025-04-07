@@ -89,6 +89,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/applications/{application}/edit', [ApplicationController::class, 'edit'])->name('applications.edit');
     Route::post('/applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
     Route::put('/applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
+    Route::delete('/applications/{id}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
 
 
     // Rotte CRUD per i clienti

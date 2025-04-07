@@ -39,22 +39,22 @@ class ApplicationController extends Controller
 
     public function update(Request $request, $id)
     {
-      
+
         $application = Application::findOrFail($id);
-         
+
         // Validazione del campo prezzo
         $request->validate([
             'price' => 'required|numeric|min:0',
         ]);
-    
+
         // Aggiorna il prezzo
         $application->update($request->only(['price']));
-    
+
         // Reindirizza alla vista index con un messaggio di successo
         return redirect()->route('applications.index')
-                         ->with('success', 'Prezzo aggiornato con successo.');
+            ->with('success', 'Prezzo aggiornato con successo.');
     }
-    
+
 
     public function associate($id)
     {
@@ -97,4 +97,14 @@ class ApplicationController extends Controller
         // Chiama il metodo generico del DataTableController
         return $dataTableController->getDataTable($request, $query);
     }
+    // ApplicationController.php
+
+    public function destroy($id)
+    {
+        $application = Application::findOrFail($id);
+        $application->delete();
+
+        return redirect()->route('applications.index')->with('success', 'Applicazione eliminata con successo.');
+    }
+
 }
