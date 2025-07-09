@@ -56,10 +56,14 @@
                     <th>Tipo</th>
                     <th>Nome</th>
                     <th>Descrizione</th>
+                    <th>Inizio</th> <!-- NEW -->
+                    <th>Fine</th> <!-- NEW -->
+                    <th>Frequenza</th> <!-- NEW -->
                     <th>Prezzo</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach ($order->items as $item)
                     <tr id="item-{{ $item->id }}">
@@ -78,16 +82,21 @@
                             @if ($item->service_type === 'application')
                                 Application
                             @elseif ($item->service_type === 'mailbox')
-                                {{ $item->mailbox->email ?? 'N/A' }}
+                                Mailbox
                             @else
                                 {{ ucfirst($item->service->service_type) ?? 'N/A' }}
                             @endif
                         </td>
+
+                        {{-- NUOVE COLONNE --}}
+                        <td>{{ $item->start_date ? \Carbon\Carbon::parse($item->start_date)->format('d/m/Y') : '-' }}</td>
+                        <td>{{ $item->end_date ? \Carbon\Carbon::parse($item->end_date)->format('d/m/Y') : '-' }}</td>
+                        <td>{{ ucfirst($item->billing_frequency) ?? '-' }}</td>
+
                         <td>
                             € <input type="number" id="price-input-{{ $item->id }}" value="{{ $item->price }}"
                                 step="0.01" class="form-control form-control-sm w-auto d-inline">
                         </td>
-
                         <td>
                             <button class="btn btn-primary save-price" data-item-id="{{ $item->id }}">Salva
                                 prezzo</button>
@@ -123,7 +132,7 @@
                         body: JSON.stringify({
                             price: priceInput.value,
                             status: document.querySelector('#order-status')
-                            .value, // Invia anche lo stato
+                                .value, // Invia anche lo stato
                         }),
                     })
                     .then((response) => response.json())

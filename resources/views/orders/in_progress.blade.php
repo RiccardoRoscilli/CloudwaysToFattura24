@@ -17,6 +17,7 @@
                     <th>Cliente</th>
                     <th>Totale</th>
                     <th>Stato</th>
+                    <th>Ultima Modifica</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
@@ -70,6 +71,17 @@
                         data: 'status',
                         name: 'orders.status',
                         title: 'Stato'
+                    },
+                    {
+                        data: 'updated_at',
+                        name: 'orders.updated_at',
+                        title: 'Ultima Modifica',
+                        render: function(data) {
+                            if (!data) return '';
+                            const date = new Date(data);
+                            return date.toLocaleDateString('it-IT') + ' ' + date.toLocaleTimeString(
+                                'it-IT');
+                        }
                     },
                     {
                         data: 'id', // Usa 'id' dell'ordine per i pulsanti di azione
