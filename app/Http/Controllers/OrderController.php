@@ -136,7 +136,7 @@ class OrderController extends Controller
     public function getOrders(Request $request)
     {
         $dataTableController = new DataTableController();
-         
+
         // Definisci la query con le relazioni tra applications e customers
         $query = Order::query()
             ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
@@ -147,7 +147,7 @@ class OrderController extends Controller
 
                 // Filtra tutti gli status diversi da 'complete'
                 $query->whereNotIn('orders.status', ['complete']);
-                 
+
             } else {
                 // Filtra per status specifico
                 $query->where('orders.status', $request->status);
@@ -401,5 +401,13 @@ class OrderController extends Controller
                 $xmlData->addChild("$key", htmlspecialchars("$value"));
             }
         }
+    }
+
+    public function markComplete(Order $order)
+    {
+        $order->status = 'complete';
+        $order->save();
+
+        return response()->json(['message' => 'Ordine completato con successo']);
     }
 }

@@ -68,6 +68,7 @@ Route::get('/preview-payment-email/{orderId}', function ($orderId) {
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::post('/orders/{order}/sendMail', [OrderController::class, 'sendMail'])->name('orders.sendMail');
+    Route::post('/orders/{order}/markComplete', [OrderController::class, 'markComplete']);
 
 
     Route::get('/configuration/edit', [ConfigurationController::class, 'edit'])->name('configuration.edit');
@@ -106,14 +107,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/orders/in-progress', [OrderController::class, 'inProgress'])->name('orders.in_progress');
     Route::get('/orders/complete', [OrderController::class, 'complete'])->name('orders.complete');
-    
+
     // Rotte resource (dopo quelle specifiche)
     Route::resource('orders', OrderController::class);
-    
+
     // Pulsante invio a Fattura24
     Route::post('/orders/{order}/sendToFattura24', [OrderController::class, 'sendToFattura24'])->name('orders.sendToFattura24');
     Route::post('/order-items/{item}/updatePrice', [OrderController::class, 'updatePrice'])->name('orderItems.update');
-    
+
     // test configurazione api
     Route::post('/test/cloudways-api', [ConfigurationController::class, 'testCloudwaysApi'])->name('test.cloudways.api');
     Route::post('/test/fattura24-api', [ConfigurationController::class, 'testFattura24Api'])->name('test.fattura24.api');

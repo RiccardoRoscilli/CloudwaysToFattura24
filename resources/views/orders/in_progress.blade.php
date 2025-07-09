@@ -24,6 +24,25 @@
             </tbody>
         </table>
     </div>
+    <!-- Modal di conferma per completare ordine -->
+    <div class="modal fade" id="confirmCompleteModal" tabindex="-1" aria-labelledby="confirmCompleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmCompleteModalLabel">Conferma Completamento Ordine</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    Sei sicuro di voler segnare questo ordine come <strong>completato</strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="confirmCompleteBtn">Conferma</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="text/javascript">
         $(function() {
@@ -70,6 +89,11 @@
         <button class="btn btn-sm btn-warning send-mail" 
                 data-order-id="${data}">
             Invia Mail
+        </button>
+           <button class="btn btn-sm btn-secondary mark-complete" 
+            data-order-id="${data}" 
+            data-bs-toggle="modal" data-bs-target="#confirmCompleteModal">
+        Complete
         </button>
     `;
                         }
@@ -128,6 +152,32 @@
                     }
                 });
             });
+            // Variabile globale per tenere traccia dell'ordine corrente
+            let orderIdToComplete = null;
+
+            $(document).on('click', '.mark-complete', function() {
+                orderIdToComplete = $(this).data('order-id');
+            });
+
+            $('#confirmCompleteBtn').on('click', function() {
+                if (!orderIdToComplete) return;
+
+                $.ajax({
+                    url: `/orders/${orderIdToComplete}/markComplete`,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        $('#confirmCompleteModal').modal('hide');
+                        $('.yajra-datatable').DataTable().ajax.reload(null, false);
+                    },
+                    error: function(xhr) {
+                        alert('Errore nel completare l\'ordine.');
+                    }
+                });
+            });
+
         });
     </script>
 @endsection
