@@ -287,7 +287,7 @@ class OrderController extends Controller
                         \Carbon\Carbon::parse($item->end_date)->format('d/m/Y');
                 } elseif ($item->service_type === 'mailbox') {
                     $mailbox = Mailbox::find($item->service_id);
-                    $description = 'Mailbox: ' . ($mailbox ? $mailbox->email : 'N/A') . ' dal ' .
+                    $description = 'Mailbox: ' . ($mailbox ? $mailbox->mailbox_email : 'N/A') . ' dal ' .
                         \Carbon\Carbon::parse($item->start_date)->format('d/m/Y') . ' al ' .
                         \Carbon\Carbon::parse($item->end_date)->format('d/m/Y');
                 } else {
