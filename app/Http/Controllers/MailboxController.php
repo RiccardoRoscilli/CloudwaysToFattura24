@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Mailbox;
 use App\Models\Customer;
-
+use Illuminate\Support\Facades\DB;
 class MailboxController extends Controller
 {
     /**
@@ -121,17 +121,25 @@ class MailboxController extends Controller
         //
     }
 
+
+
     public function getMailboxes(Request $request)
     {
         $dataTableController = new DataTableController();
 
-        // Definisci la query con le relazioni tra mailboxes e customers
         $query = Mailbox::query()
             ->leftJoin('customers', 'mailboxes.customer_id', '=', 'customers.id')
-            ->select('mailboxes.*', 'customers.name'); // Alias corretto per la colonna customer_name
+            ->select([
+                'mailboxes.id',
+                'mailboxes.mailbox_email',
+                'mailboxes.server',
+                'mailboxes.IMAPport',
+                'mailboxes.SMTPport',
+                \DB::raw('customers.name'),
+            ]);
 
-        // Chiama il metodo generico del DataTableController
         return $dataTableController->getDataTable($request, $query);
     }
+
 
 }
