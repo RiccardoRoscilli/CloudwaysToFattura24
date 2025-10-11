@@ -11,7 +11,7 @@ class Mailbox extends Model
     use HasFactory;
 
     protected $fillable = [
-        'email',
+        'mailbox_email',
         'password',
         'server',
         'IMAPport',
