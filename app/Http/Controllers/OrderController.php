@@ -290,7 +290,7 @@ class OrderController extends Controller
                     $description = 'Mailbox: ' . ($mailbox ? $mailbox->mailbox_email : 'N/A') . ' dal ' .
                         \Carbon\Carbon::parse($item->start_date)->format('d/m/Y') . ' al ' .
                         \Carbon\Carbon::parse($item->end_date)->format('d/m/Y');
-                        dd($description);
+                         
                 } else {
                     $description = 'N/A';
                 }
