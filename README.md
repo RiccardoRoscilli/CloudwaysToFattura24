@@ -15,19 +15,6 @@ Funzionalità principali
 *   **Creazione automatica di ordini su Fattura24:** Utilizzando le API di Fattura24, genera automaticamente ordini, risparmiando tempo e minimizzando errori manuali.
 *   **Gestione dei pagamenti:** Tiene traccia dello stato del pagamento per ogni ordine, inclusi dettagli come tipo di pagamento, data e ID. Aggiorna di conseguenza anche lo status dell'ordine.
 
-Demo Online
------------
-
-È disponibile una demo dell'applicazione online. Puoi accedervi con le seguenti credenziali:
-
-**Link alla demo:** [https://phplaravel-1168665-4968616.cloudwaysapps.com/](https://phplaravel-1168665-4968616.cloudwaysapps.com/)
-
-**Credenziali:**
-
-*   **Email:** demo@demo.it
-*   **Password:** demo@2024
-
-> **Nota:** Ricordati di cambiare le API e le password una volta terminato l'utilizzo della demo.
 
 Installazione
 -------------
