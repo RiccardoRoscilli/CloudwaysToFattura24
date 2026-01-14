@@ -333,7 +333,7 @@ class OrderController extends Controller
 
             // Controllo della risposta
             if ((string) $responseXml->returnCode === '0') {
-                $order->update(['status' => 'sentF24']);
+                $order->update(['status' => 'complete']);
                 return response()->json([
                     'success' => true,
                     'message' => 'Ordine inviato a Fattura24 con successo!',
