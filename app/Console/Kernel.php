@@ -12,7 +12,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // Crea ordini trimestrali il primo giorno del trimestre alle 00:00
         $schedule->command('orders:create-quarterly')->quarterlyOn(1, '00:00');
+        
+        // Invia report Fattura24 il primo giorno del trimestre alle 01:00 (dopo la creazione degli ordini)
+        $schedule->command('fattura24:send-daily-report')->quarterlyOn(1, '01:00');
     }
 
     /**
