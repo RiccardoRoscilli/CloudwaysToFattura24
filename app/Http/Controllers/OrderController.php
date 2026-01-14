@@ -334,6 +334,18 @@ class OrderController extends Controller
             // Controllo della risposta
             if ((string) $responseXml->returnCode === '0') {
                 $order->update(['status' => 'complete']);
+                
+                // Invia email di notifica all'admin
+                try {
+                    \Mail::to($admin->email)->send(new \App\Mail\OrderSentToFattura24(
+                        $order,
+                        (string) $responseXml->docId,
+                        (string) $responseXml->docNumber
+                    ));
+                } catch (\Exception $mailException) {
+                    \Log::error('Errore invio email notifica Fattura24:', ['error' => $mailException->getMessage()]);
+                }
+                
                 return response()->json([
                     'success' => true,
                     'message' => 'Ordine inviato a Fattura24 con successo!',
