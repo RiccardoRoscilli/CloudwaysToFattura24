@@ -7,24 +7,37 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 use App\Models\Order;
 use App\Models\OrderItem;
 
-echo "=== CREAZIONE ORDINE DOMINI ELDA ===\n\n";
+echo "=== CREAZIONE ORDINE DOMINI ELDA + SPOSTAMENTO CLIENTE ===\n\n";
 
-$customerId = 88;
+$oldCustomerId = 88;  // Lava & Asciuga di Zanoli Elda
+$newCustomerId = 228; // Le Essenze di Elda srl
 $startDate = '2026-03-11';
 $endDate = '2027-03-11';
 
-$services = DB::table('services')
-    ->where('customer_id', $customerId)
-    ->where('service_type', 'dominio')
-    ->where('is_active', 1)
-    ->get();
+// Domini da spostare (quelli leessenzedielda.*)
+$domainIds = [160, 161, 162, 163, 164, 165, 166, 167]; // leessenzedielda.*
 
-echo "Domini trovati: " . $services->count() . "\n";
-echo "Totale: " . $services->sum('price') . "€\n\n";
+$services = DB::table('services')->whereIn('id', $domainIds)->where('is_active', 1)->get();
 
-// Crea ordine
+echo "1. Spostamento domini da cliente {$oldCustomerId} a {$newCustomerId}\n";
+foreach ($services as $s) {
+    echo "   {$s->service_name} (ID {$s->id})\n";
+}
+
+DB::table('services')->whereIn('id', $domainIds)->update(['customer_id' => $newCustomerId]);
+echo "   ✅ " . count($domainIds) . " domini spostati\n\n";
+
+// Sposta anche le mailbox leessenzedielda.com
+$mailboxMoved = DB::table('mailboxes')
+    ->where('mailbox_email', 'like', '%@leessenzedielda.com')
+    ->update(['customer_id' => $newCustomerId]);
+echo "2. Mailbox leessenzedielda.com spostate: {$mailboxMoved}\n\n";
+
+// Crea ordine per il nuovo cliente
+echo "3. Creazione ordine per cliente {$newCustomerId}\n";
+
 $order = Order::create([
-    'customer_id' => $customerId,
+    'customer_id' => $newCustomerId,
     'amount' => $services->sum('price'),
     'start_date' => $startDate,
     'end_date' => $endDate,
@@ -32,7 +45,7 @@ $order = Order::create([
     'status' => 'in_progress',
 ]);
 
-echo "Ordine creato: ID " . $order->id . "\n\n";
+echo "   Ordine ID: {$order->id} | Totale: {$services->sum('price')}€\n";
 
 foreach ($services as $s) {
     OrderItem::create([
@@ -44,15 +57,11 @@ foreach ($services as $s) {
         'start_date' => $startDate,
         'end_date' => $endDate,
     ]);
-    echo "  ✅ {$s->service_name} → {$s->price}€\n";
+    echo "   ✅ {$s->service_name} → {$s->price}€\n";
 }
 
 // Aggiorna scadenze
-DB::table('services')
-    ->where('customer_id', $customerId)
-    ->where('service_type', 'dominio')
-    ->where('is_active', 1)
-    ->update(['expiry_date' => $endDate]);
+DB::table('services')->whereIn('id', $domainIds)->update(['expiry_date' => $endDate]);
+echo "\n4. Scadenze aggiornate a {$endDate}\n";
 
-echo "\n✅ Scadenze aggiornate a {$endDate}\n";
-echo "✅ Ordine " . $order->id . " creato. Invialo a Fattura24 dall'interfaccia.\n";
+echo "\n✅ Completato! Ordine {$order->id} pronto per invio a Fattura24.\n";
