@@ -34,6 +34,37 @@
         </table>
     </div>
 
+    <!-- Modal Associa Cliente -->
+    <div class="modal fade" id="associateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="associateForm" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title">Associa Cliente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Mailbox: <strong id="associateEmail"></strong></p>
+                        <div class="mb-3">
+                            <label class="form-label">Cliente</label>
+                            <select name="customer_id" id="associateCustomer" class="form-control" required>
+                                <option value="">Seleziona un cliente</option>
+                                @foreach(App\Models\Customer::orderBy('name')->get() as $customer)
+                                    <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-primary">Associa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script type="text/javascript">
         $(function() {
             var entity = 'mailbox'; // Nome corretto del model
@@ -63,24 +94,37 @@
     render: function(data){ return data || 'Nessun cliente'; }
   },
   {
-    data: 'id',
+    data: null,
     name: 'mailboxes.id',
     orderable: false,
     searchable: false,
-    render: function (data) {
-      return `
-        <a href="/mailboxes/${data}/edit" class="btn btn-sm btn-info">Modifica</a>
-        <form action="/mailboxes/${data}" method="POST" style="display:inline;">
+    render: function (data, type, row) {
+      var html = `<a href="/mailboxes/${row.id}/edit" class="btn btn-sm btn-info">Modifica</a> `;
+      if (!row.name) {
+        html += `<button class="btn btn-sm btn-warning btn-associate" data-id="${row.id}" data-email="${row.mailbox_email}">Associa</button> `;
+      }
+      html += `<form action="/mailboxes/${row.id}" method="POST" style="display:inline;">
           @csrf
           @method('DELETE')
           <button type="submit" class="btn btn-sm btn-danger"
             onclick="return confirm('Sei sicuro di voler eliminare questa mailbox?')">Elimina</button>
         </form>`;
+      return html;
     }
   }
 ],
 order: [[0, 'asc']]
 
+            });
+
+            // Handler pulsante Associa
+            $(document).on('click', '.btn-associate', function() {
+                var id = $(this).data('id');
+                var email = $(this).data('email');
+                $('#associateEmail').text(email);
+                $('#associateForm').attr('action', '/mailboxes/' + id + '/associate');
+                $('#associateCustomer').val('');
+                $('#associateModal').modal('show');
             });
         });
     </script>
