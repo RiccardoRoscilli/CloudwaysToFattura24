@@ -57,7 +57,7 @@
                         searchable: false, // Impedisci la ricerca sulla colonna 'action'
                         render: function(data, type, row) {
                             return `
-                                <a href="/customers/${data}/services" class="btn btn-info btn-sm">Servizi</a>
+                                <a href="/customers/${data}" class="btn btn-info btn-sm">Servizi</a>
                                 <a href="/customers/${data}/edit" class="btn btn-primary btn-sm">Modifica</a>
                             `;
                         }
