@@ -6,11 +6,24 @@
 
         <div>
             <h2>Applications</h2>
-            <ul>
+            @if($customer->applications->count() > 0)
+            <table class="table table-bordered table-sm">
+                <thead><tr><th>Nome</th><th>Tipo</th><th>FQDN</th><th>Prezzo</th><th>Attiva</th></tr></thead>
+                <tbody>
                 @foreach($customer->applications as $application)
-                    <li>{{ $application->label }} ({{ $application->application }})</li>
+                    <tr>
+                        <td>{{ $application->label }}</td>
+                        <td>{{ $application->application }}</td>
+                        <td>{{ $application->app_fqdn }}</td>
+                        <td>€{{ number_format($application->price ?? 0, 2) }}</td>
+                        <td>{!! $application->is_active ? '<span class="badge bg-success">Sì</span>' : '<span class="badge bg-secondary">No</span>' !!}</td>
+                    </tr>
                 @endforeach
-            </ul>
+                </tbody>
+            </table>
+            @else
+                <p class="text-muted">Nessuna applicazione associata.</p>
+            @endif
         </div>
 
         <!-- Form per associare una nuova Application -->
