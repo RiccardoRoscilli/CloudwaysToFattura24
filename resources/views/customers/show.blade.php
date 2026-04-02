@@ -26,5 +26,49 @@
             </div>
             <button type="submit" class="btn btn-primary mt-2">Associa Application</button>
         </form>
+
+        <div class="mt-4">
+            <h2>Servizi (Domini/Hosting)</h2>
+            @if($services->count() > 0)
+            <table class="table table-bordered table-sm">
+                <thead><tr><th>Nome</th><th>Tipo</th><th>Prezzo</th><th>Scadenza</th><th>Frequenza</th><th>Attivo</th></tr></thead>
+                <tbody>
+                @foreach($services as $service)
+                    <tr>
+                        <td>{{ $service->service_name }}</td>
+                        <td>{{ $service->service_type }}</td>
+                        <td>€{{ number_format($service->price, 2) }}</td>
+                        <td>{{ $service->expiry_date }}</td>
+                        <td>{{ $service->billing_frequency }}</td>
+                        <td>{!! $service->is_active ? '<span class="badge bg-success">Sì</span>' : '<span class="badge bg-secondary">No</span>' !!}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+            @else
+                <p class="text-muted">Nessun servizio associato.</p>
+            @endif
+        </div>
+
+        <div class="mt-4">
+            <h2>Mailbox</h2>
+            @if($mailboxes->count() > 0)
+            <table class="table table-bordered table-sm">
+                <thead><tr><th>Email</th><th>Server</th><th>IMAP</th><th>SMTP</th></tr></thead>
+                <tbody>
+                @foreach($mailboxes as $mb)
+                    <tr>
+                        <td>{{ $mb->mailbox_email }}</td>
+                        <td>{{ $mb->server }}</td>
+                        <td>{{ $mb->IMAPport }}</td>
+                        <td>{{ $mb->SMTPport }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+            @else
+                <p class="text-muted">Nessuna mailbox associata.</p>
+            @endif
+        </div>
     </div>
 @endsection

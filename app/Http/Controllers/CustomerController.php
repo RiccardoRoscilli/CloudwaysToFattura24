@@ -91,9 +91,11 @@ class CustomerController extends Controller
     public function show($id)
     {
         $customer = Customer::findOrFail($id);
-        $applications = Application::whereNull('customer_id')->get(); // Applicazioni non ancora associate
+        $applications = Application::whereNull('customer_id')->get();
+        $services = \App\Models\Service::where('customer_id', $id)->get();
+        $mailboxes = \App\Models\Mailbox::where('customer_id', $id)->get();
 
-        return view('customers.show', compact('customer', 'applications'));
+        return view('customers.show', compact('customer', 'applications', 'services', 'mailboxes'));
     }
 
     public function addApplication(Request $request, $customerId)
